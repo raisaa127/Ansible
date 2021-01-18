@@ -1,0 +1,24 @@
+
+#############Download file from s3###############
+- hosts: localhost
+  tasks:
+   - name: Download file from s3
+     amazon.aws.aws_s3:
+       bucket: raisaa
+       object : word press.txt
+       mode: get
+       dest: /home/ubuntu/dummy
+       aws_access_key: XXXXXXXXXXXXXXXXXXXx
+       aws_secret_key: YYYYYYYYYYYYYYYYYYYY
+
+################Upload file to s3##########
+
+  - name: Upload file to s3
+    amazon.aws.aws_s3:
+      bucket: raisaa
+      object: /test1/test.yml
+      src: /home/ubuntu/test.yml
+      mode: put
+      permission: public-read
+      aws_access_key: XXXXXXXXXXXXXXXXXXXx
+      aws_secret_key: YYYYYYYYYYYYYYYYYYYY
