@@ -1,0 +1,89 @@
+---
+# Setup LAMP Server
+- hosts: all
+  tasks:
+   - name: Install LAMP Server
+     become: yes
+     become_user: root
+     apt:
+            update_cache: yes
+            pkg:
+                 - apache2
+                 - mysql-server
+                 - wordpress
+                 - php-mysql
+                 - php-gd
+                 - php-fpm
+                 - python3-pip 
+            state: latest
+     vars: 
+            mysql_root_password: welcome@123   
+
+   - name: Enable universe repository
+     become: yes
+     raw: sudo add-apt-repository universe
+
+   - name: Install Python
+     become: yes
+     pip: 
+            name: pymysql
+            state: latest       
+
+   - name: Start Apache Service
+     become: yes
+     service:
+            name: apache2
+            state: started
+            enabled: yes
+   - name: Start mysql service
+     become: yes
+     service:
+            name: apache2
+            state: started
+            enabled: yes
+
+   - name: Creatig .my.cnf file
+     file: 
+            path: /home/ubuntu/.my.cnf
+            mode: u+rw,g-wx,o-rwx
+            state: touch
+
+   - name: Adding content to my.cnf file
+     copy: 
+            dest: /home/ubuntu/.my.conf
+            content: |
+                    [client]
+                    user=root
+                    password=welcome@123
+                    socket=/var/lib/mysql/mysql.sock
+                    port=3306
+   - name: Assigning a password to the MySQL original root user
+     become: yes
+     become_user: root
+     mysql_user:
+            config_file: /home/ubuntu/.my.conf
+            login_unix_socket: /var/run/mysqld/mysqld.sock
+            login_password: welcome@123
+            login_user: root
+            name: root
+            password: welcome@123
+            check_implicit_admin: yes
+            state: present
+   - name: Create SQL Database
+     mysql_db:
+            name: wordpress-db
+            state: present
+            login_unix_socket: /var/run/mysqld/mysqld.sock
+            config_file: /home/ubuntu/.my.conf
+            login_user: root
+            login_password: welcome@123
+
+
+   - name: Create Database user
+     mysql_user:
+            name: wordpress
+            password: wordpress@2020
+            state: present
+            login_user: root
+            login_password: welcome@123
+
