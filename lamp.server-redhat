@@ -1,0 +1,102 @@
+---
+# Setup LAMP Server
+- hosts: all
+  tasks:
+   - name: Install LAMP Server
+     become: yes
+     become_user: root
+     yum:
+            pkg:
+                 - httpd
+                 - httpd-devel
+                 - mysql
+                 - mysql-server
+                 - mysql-devel
+                 - php
+                 - php-devel
+                 - php-mysqlnd
+                 - python3-pip 
+            state: latest
+
+   - name: Install Python
+     become: yes
+     pip: 
+            name: pymysql
+            state: latest
+   
+   - name: Download and unpack latest WordPress
+     unarchive:
+            src: https://wordpress.org/latest.tar.gz
+            dest: /home/ec2-user
+            remote_src: yes
+
+   - name: Start Apache Service
+     become: yes
+     service:
+            name: httpd
+            state: started
+            enabled: yes
+   - name: Start mysql service
+     become: yes
+     service:
+            name: mysqld
+            state: started
+            enabled: yes
+   - name: Set Root password for SQL         
+     mysql_user:
+            login_host: localhost
+            login_user: root
+            login_password: welcome@2021
+            name: root
+            password: welcome@123
+            host_all: yes
+            state: present
+ 
+   - name: Set ~/.my.cnf file
+     template: src=/home/ec2-user/.my.cnf dest=/home/ec2-user/.my.cnf mode=0600
+
+   - name: Create SQL Database for wordpress
+     mysql_db:
+            name: wordpress-db
+            login_user: root
+            login_password: welcome@123
+            state: present
+   - name: Create Database word press user
+     mysql_user:
+            name: wordpress
+            password: wordpress@2020
+            state: present
+            login_user: root
+            login_password: welcome@123
+            priv: wordpress-db.*:ALL
+   
+   - name: Copy sample config file
+     command: cp /home/ec2-user/wordpress/wp-config-sample.php /home/ec2-user/wordpress/wp-config.php
+     become: yes
+
+   - name: Update WordPress config file
+     template:
+            src: /home/ec2-user/wp-config.php.j2
+            dest: /home/ec2-user/wordpress/wp-config.php
+
+   - name: Edit apache config file
+     template:
+            src: /home/ec2-user/httpd.j2
+            dest: /etc/httpd/conf/httpd.conf
+   - name: Set ownership
+     file:
+            path: /var/www/
+            state: directory
+            recurse: yes
+            owner: apache
+            group: apache
+   - name: Set the correct permissions on Wordpress directories
+     command: find /var/www -type d -exec chmod 750 {} \;
+
+   - name: Set the correct permissions for Wordpress files
+     command: find /var/www -type f -exec chmod 640 {} \;
+  
+   - name: Restart Apache
+     service: 
+            name: httpd
+            state: restarted
