@@ -1,0 +1,44 @@
+---
+# Setup LAMP Server
+- hosts: all
+  tasks:
+   - name: Install LAMP Server
+     become: yes
+     apt:
+            update_cache: yes
+            pkg:
+                 - apache2
+                 - mysql-server
+                 - wordpress
+                 - php-mysql
+                 - php-gd
+                 - php-fpm
+                 - python3-pip
+                 - python 2.7
+                 - libmysqlclient-dev
+            state: latest
+
+   - name: Start Apache Service
+     become: yes
+     service:
+            name: apache2
+            state: started
+            enabled: yes
+   - name: Start mysql service
+     become: yes
+     service:
+            name: apache2
+            state: started
+            enabled: yes
+
+   - name: Create SQL Database
+     mysql_db:
+            name: wordpress-db
+            state: present
+
+   - name: Create Database user
+     mysql_user:
+            name: wordpress
+            password: wordpress@2020
+            state: present
+
