@@ -1,5 +1,4 @@
 ---
-# Setup LAMP Server
 - hosts: all
   tasks:
    - name: Install LAMP Server
