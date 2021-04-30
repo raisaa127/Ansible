@@ -3,8 +3,7 @@
   tasks:
     - name: ensure Apache is at the latest version
       apt: name=httpd state=latest
-      retries: 100
-      until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+      dpkg_options: 'force-confold,force-confdef'
     - name: start httpd
       service:
           name: httpd
