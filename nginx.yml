@@ -3,7 +3,6 @@
   tasks:
     - name: ensure Apache is at the latest version
       apt: name=httpd state=latest
-      dpkg_options: 'force-confold,force-confdef'
     - name: start httpd
       service:
           name: httpd
