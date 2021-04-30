@@ -4,6 +4,7 @@
     - name: ensure Apache is at the latest version
       apt: name=httpd state=latest
     - name: start httpd
+      become_method: su
       service:
           name: httpd
           state: started
