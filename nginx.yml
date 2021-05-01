@@ -1,9 +1,9 @@
 ---
 - hosts: all
-  sudo:yes
   tasks:
     - name: ensure Apache is at the latest version
       apt: name=apache2 update_cache=yes
+      sudo: yes
     - name: start httpd
       service:
           name: apache2
