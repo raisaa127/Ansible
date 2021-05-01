@@ -1,10 +1,10 @@
 ---
 - hosts: all
+  sudo:yes
   tasks:
     - name: ensure Apache is at the latest version
-      apt: name=httpd state=latest
+      apt: name=apache2 update_cache=yes
     - name: start httpd
-      become_method: su
       service:
-          name: httpd
+          name: apache2
           state: started
