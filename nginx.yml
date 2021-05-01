@@ -1,10 +1,16 @@
 ---
+# Setup LAMP Server
 - hosts: all
   tasks:
-    - name: ensure Apache is at the latest version
-      apt: name=apache2 update_cache=yes
-      sudo: yes
-    - name: start httpd
-      service:
-          name: apache2
-          state: started
+   - name: Install LAMP Server
+     become: yes
+     apt:
+            update_cache: yes
+            pkg:
+                 - apache2
+   - name: Start Apache Service
+     become: yes
+     service:
+            name: apache2
+            state: started
+            enabled: yes                
